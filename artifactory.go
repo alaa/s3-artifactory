@@ -59,6 +59,7 @@ func main() {
 		log.Fatal("Failed to get object", err)
 	}
 
+	fmt.Fprintf(os.Stderr, "Last Modfied: %s\n", result.LastModified)
 	// Print only the artifact body to stdout channel.
 	io.Copy(os.Stdout, result.Body)
 
