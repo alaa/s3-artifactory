@@ -26,7 +26,10 @@ func main() {
 		Prefix: aws.String(prefix),
 	}
 
-	resp, _ := s3svc.ListObjects(params)
+	resp, err := s3svc.ListObjects(params)
+	if err != nil {
+		log.Fatal("Bucket or keypath not found!")
+	}
 	var builds []int
 	for _, value := range resp.Contents {
 		parts := strings.Split(*value.Key, "/")
