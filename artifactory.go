@@ -9,18 +9,30 @@ import (
 	"strconv"
 	"strings"
 
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-func main() {
-	bucket := "build-artifacts"
-	prefix := "Staging_App"
+var (
+	bucket  = "build-artifacts"
+	project = kingpin.Arg("project", "Project name").Required().String()
+	step    = kingpin.Arg("step", "Step name to fetch artifact from").Required().String()
+	env     = kingpin.Arg("env", "Environment name").Required().String()
+)
 
+func prefix(project, step, env string) string {
+	return fmt.Sprintf("%s_%s/%s_%s_%s%s", env, project, env, step, project, step)
+}
+
+func main() {
+	kingpin.Parse()
 	s3svc := s3.New(session.New(), &aws.Config{
 		Region: aws.String("eu-central-1"),
 	})
+	prefix := prefix(*project, *step, *env)
 	params := &s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
 		Prefix: aws.String(prefix),
